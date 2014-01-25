@@ -1,0 +1,14 @@
+﻿[초기 홈페이지]
+http://su.gilgil.net/manage/
+
+
+[local web server interface]
+
+port number : 8081
+
+http://127.0.0.1:8081/open      : open su
+http://127.0.0.1:8081/close     : close su
+http://127.0.0.1:8081/show      : show main window
+http://127.0.0.1:8081/hide      : hide main window
+http://127.0.0.1:8081/option    : show option window
+http://127.0.0.1:8081/terminate : terminate application

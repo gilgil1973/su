@@ -1,0 +1,5 @@
+application icon  : http://www.censorshiplebanon.org/favicon.ico
+
+censorship mark   : https://www.eff.org/pages/alternate-no-censorship-buttons
+
+start button : http://godhungry.org/2013/07/15/monday-start-resources-for-the-week-45/
