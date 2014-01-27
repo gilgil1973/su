@@ -23,3 +23,13 @@ void ChangeHttpRequestDummyHost::change(VHttpRequest& request)
 {
   request.header.setValue("Host", "www.google.com");
 }
+
+
+// ----------------------------------------------------------------------------
+// ChangeHttpRequestSslAbsPath
+// ----------------------------------------------------------------------------
+void ChangeHttpRequestSslAbsPath::change(VHttpRequest& request)
+{
+  request.requestLine.path =
+    "https://" + request.header.value("Host") + request.requestLine.path;
+}

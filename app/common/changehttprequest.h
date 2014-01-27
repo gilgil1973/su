@@ -64,4 +64,13 @@ public:
   virtual void change(VHttpRequest& request);
 };
 
+// ----------------------------------------------------------------------------
+// ChangeHttpRequestSslAbsPath
+// ----------------------------------------------------------------------------
+class ChangeHttpRequestSslAbsPath : public ChangeHttpRequest
+{
+public:
+  virtual void change(VHttpRequest& request);
+};
+
 #endif // __CHANGE_HTTP_REQUEST_H__
