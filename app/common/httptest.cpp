@@ -134,6 +134,7 @@ HttpTest::HttpTest()
   resultAddLine   = RESULT_NONE;
   resultAddSpace  = RESULT_NONE;
   resultDummyHost = RESULT_NONE;
+  resultSslAbsPath = RESULT_NONE;
 }
 
 void HttpTest::test()
@@ -178,6 +179,16 @@ void HttpTest::test()
   dummyHostThread.result = &resultDummyHost;
   dummyHostThread.change = new ChangeHttpRequestDummyHost;
   dummyHostThread.open();
+
+  //
+  // sslAbsolutePath
+  //
+  HttpTestThread sslAbsPath;
+  sslAbsPath.host = host;
+  sslAbsPath.port = port;
+  sslAbsPath.result = &resultSslAbsPath;
+  sslAbsPath.change = new ChangeHttpRequestSslAbsolutePath;
+  sslAbsPath.open();
 
   //
   // close
