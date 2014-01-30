@@ -62,12 +62,13 @@ int main(int argc, char *argv[])
   httpTest.port = param.port;
   httpTest.test();
 
-  printf("0:none      %d\n", httpTest.resultNone);
-  printf("1:addLine   %d\n", httpTest.resultAddLine);
-  printf("2:addSpace  %d\n", httpTest.resultAddSpace);
-  printf("3:dummyHost %d\n", httpTest.resultDummyHost);
+  printf("0:none       %d\n", httpTest.resultNone);
+  printf("1:addLine    %d\n", httpTest.resultAddLine);
+  printf("2:addSpace   %d\n", httpTest.resultAddSpace);
+  printf("3:dummyHost  %d\n", httpTest.resultDummyHost);
+  printf("4:sslAbsPath %d\n", httpTest.resultSslAbsPath);
 
-  printf("best policy=%d\n", (int)httpTest.bestPolicy());
+  printf("best policy= %d\n", (int)httpTest.bestPolicy());
 
   return 0;
 }

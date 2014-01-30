@@ -47,6 +47,7 @@ public:
   int resultAddLine;
   int resultAddSpace;
   int resultDummyHost;
+  int resultSslAbsPath;
 };
 
 #endif // __HTTP_TEST_H__

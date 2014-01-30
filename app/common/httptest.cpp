@@ -134,6 +134,7 @@ HttpTest::HttpTest()
   resultAddLine   = RESULT_NONE;
   resultAddSpace  = RESULT_NONE;
   resultDummyHost = RESULT_NONE;
+  resultSslAbsPath = RESULT_NONE;
 }
 
 void HttpTest::test()
@@ -180,12 +181,23 @@ void HttpTest::test()
   dummyHostThread.open();
 
   //
+  // sslAbsPath
+  //
+  HttpTestThread sslAbsPathThread;
+  sslAbsPathThread.host = host;
+  sslAbsPathThread.port = port;
+  sslAbsPathThread.result = &resultSslAbsPath;
+  sslAbsPathThread.change = new ChangeHttpRequestSslAbsPath;
+  sslAbsPathThread.open();
+
+  //
   // close
   //
   noneThread.wait(20000);      noneThread.close();
   addLineThread.wait(20000);   addLineThread.close();
   addSpaceThread.wait(20000);  addSpaceThread.close();
   dummyHostThread.wait(20000); dummyHostThread.close();
+  sslAbsPathThread.wait(20000);sslAbsPathThread.close();
 }
 
 HttpRequestChangePolicy HttpTest::bestPolicy()
