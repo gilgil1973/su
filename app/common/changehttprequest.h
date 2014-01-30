@@ -22,7 +22,8 @@ typedef enum
   ChangeNone      = 0,
   ChangeAddLine   = 1,
   ChangeAddSpace  = 2,
-  ChangeDummyHost = 3
+  ChangeDummyHost = 3,
+  ChangeSslAbsPath = 4,
 } HttpRequestChangePolicy;
 
 // ----------------------------------------------------------------------------
