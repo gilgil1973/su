@@ -183,12 +183,12 @@ void HttpTest::test()
   //
   // sslAbsPath
   //
-  HttpTestThread sslAbsPath;
-  sslAbsPath.host = host;
-  sslAbsPath.port = port;
-  sslAbsPath.result = &resultSslAbsPath;
-  sslAbsPath.change = new ChangeHttpRequestSslAbsPath;
-  sslAbsPath.open();
+  HttpTestThread sslAbsPathThread;
+  sslAbsPathThread.host = host;
+  sslAbsPathThread.port = port;
+  sslAbsPathThread.result = &resultSslAbsPath;
+  sslAbsPathThread.change = new ChangeHttpRequestSslAbsPath;
+  sslAbsPathThread.open();
 
   //
   // close
@@ -197,6 +197,7 @@ void HttpTest::test()
   addLineThread.wait(20000);   addLineThread.close();
   addSpaceThread.wait(20000);  addSpaceThread.close();
   dummyHostThread.wait(20000); dummyHostThread.close();
+  sslAbsPathThread.wait(20000);sslAbsPathThread.close();
 }
 
 HttpRequestChangePolicy HttpTest::bestPolicy()
