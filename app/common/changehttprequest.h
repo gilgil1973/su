@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------------------
 //
-// site unblocker version 1.1
+// site unblocker version 1.4
 //
 // http://www.gilgil.net
 //

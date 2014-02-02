@@ -204,6 +204,8 @@ HttpRequestChangePolicy HttpTest::bestPolicy()
 {
   // if (resultNone      == RESULT_OK) return ChangeNone;
   if (resultAddLine   >= RESULT_OK && resultAddLine  != RESULT_BAD_REQUEST) return ChangeAddLine;
+  if (resultAddLine   >= RESULT_OK && resultAddLine  != RESULT_BAD_REQUEST) return ChangeAddLine;
+  if (resultSslAbsPath   >= RESULT_OK && resultSslAbsPath  != RESULT_BAD_REQUEST) return ChangeSslAbsPath;
   if (resultAddSpace  >= RESULT_OK && resultAddSpace != RESULT_BAD_REQUEST) return ChangeAddSpace;
   if (resultDummyHost == RESULT_OK) return ChangeDummyHost;
   LOG_ERROR("no appropriate policy for %s:%d", host.toLatin1().data(), port);

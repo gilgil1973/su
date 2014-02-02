@@ -208,6 +208,17 @@ void BypassHttpProxy::myBeforeRequest(VHttpRequest& request, VTcpSession* inSess
           change.change(request);
           break;
         }
+        case ChangeSslAbsPath:
+        {
+          ChangeHttpRequestSslAbsPath change;
+          change.change(request);
+          break;
+        }
+        default:
+        {
+          LOG_FATAL("invalid policy(%d)", (int)it.value().policy);
+          break;
+        }
       }
     }
   }
