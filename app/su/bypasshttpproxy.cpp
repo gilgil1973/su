@@ -52,13 +52,17 @@ BypassHttpProxy::BypassHttpProxy(void* owner) : VHttpProxy(owner)
     "HTTP/1.0 302 Redirect\r\n"
     "Location: http://www.warning.or.kr";
 
-  HostMgr::Key key; HostMgr::Value value;
+  defaultPolicy = ChangeNone;
 
-  key.host = "grooveshark.com"; key.port = 80; value.policy = ChangeAddLine;
-  hostMgr.items.insert(key, value);
+  {
+    HostMgr::Key key; HostMgr::Value value;
 
-  key.host = "www.grooveshark.com"; key.port = 80; value.policy = ChangeAddLine;
-  hostMgr.items.insert(key, value);
+    key.host = "grooveshark.com"; key.port = 80; value.policy = ChangeAddLine;
+    hostMgr.items.insert(key, value);
+
+    key.host = "www.grooveshark.com"; key.port = 80; value.policy = ChangeAddLine;
+    hostMgr.items.insert(key, value);
+  }
 
   QObject::connect(
     this, SIGNAL(beforeRequest(VHttpRequest&,VTcpSession*,VTcpClient*)),
@@ -165,14 +169,18 @@ bool BypassHttpProxy::disableProxy()
 void BypassHttpProxy::load(VXml xml)
 {
   VHttpProxy::load(xml);
-  blockMsg = xml.getStr("blockMsg", blockMsg).toLatin1();
+
+  blockMsg = qPrintable(xml.getStr("blockMsg", blockMsg));
+  defaultPolicy = (HttpRequestChangePolicy)xml.getInt("defaultPolicy", (int)defaultPolicy);
   hostMgr.load(xml.gotoChild("hostMgr"));
 }
 
 void BypassHttpProxy::save(VXml xml)
 {
   VHttpProxy::save(xml);
+
   xml.setStr("blockMsg", blockMsg);
+  xml.setInt("defaultPolicy", (int)defaultPolicy);
   hostMgr.save(xml.gotoChild("hostMgr"));
 }
 
@@ -181,49 +189,50 @@ void BypassHttpProxy::myBeforeRequest(VHttpRequest& request, VTcpSession* inSess
   Q_UNUSED(inSession)
   QString host = outClient->host;
   int     port = outClient->port;
+
+  HttpRequestChangePolicy policy = defaultPolicy;
+
   {
     VLock lock(hostMgr);
     HostMgr::Key key; key.host = host; key.port = port;
     HostMgr::HostItemMap::iterator it = hostMgr.items.find(key);
-    if (it != hostMgr.items.end())
+    if (it != hostMgr.items.end()) policy = it.value().policy;
+  }
+
+  switch (policy)
+  {
+    case ChangeNone: break;
+    case ChangeAddLine:
     {
-      switch (it.value().policy)
-      {
-        case ChangeNone: break;
-        case ChangeAddLine:
-        {
-          ChangeHttpRequestAddLine change;
-          change.change(request);
-          break;
-        }
-        case ChangeAddSpace:
-        {
-          ChangeHttpRequestAddSpace change;
-          change.change(request);
-          break;
-        }
-        case ChangeDummyHost:
-        {
-          ChangeHttpRequestDummyHost change;
-          change.change(request);
-          break;
-        }
-        case ChangeSslAbsPath:
-        {
-          ChangeHttpRequestSslAbsPath change;
-          change.change(request);
-          break;
-        }
-        default:
-        {
-          LOG_FATAL("invalid policy(%d)", (int)it.value().policy);
-          break;
-        }
-      }
+      ChangeHttpRequestAddLine change;
+      change.change(request);
+      break;
+    }
+    case ChangeAddSpace:
+    {
+      ChangeHttpRequestAddSpace change;
+      change.change(request);
+      break;
+    }
+    case ChangeDummyHost:
+    {
+      ChangeHttpRequestDummyHost change;
+      change.change(request);
+      break;
+    }
+    case ChangeSslAbsPath:
+    {
+      ChangeHttpRequestSslAbsPath change;
+      change.change(request);
+      break;
+    }
+    default:
+    {
+      LOG_FATAL("invalid policy(%d)", (int)policy);
+      break;
     }
   }
-  LOG_DEBUG("%s:%d", outClient->host.toLatin1().data(), outClient->port);
-  //request.requestLine.method = "\r\n" + request.requestLine.method;
+  LOG_DEBUG("%s:%d", qPrintable(outClient->host), outClient->port);
 }
 
 void BypassHttpProxy::myBeforeResponse(QByteArray& msg, VTcpClient* outClient, VTcpSession* inSession)

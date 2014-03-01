@@ -32,10 +32,9 @@ protected:
   bool disableProxy();
 
 public:
-  HostMgr hostMgr;
-
-public:
-  QByteArray blockMsg;
+  QByteArray              blockMsg;
+  HttpRequestChangePolicy defaultPolicy;
+  HostMgr                 hostMgr;
 
 public:
   virtual void load(VXml xml);

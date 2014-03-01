@@ -55,7 +55,7 @@ void MainDlg::load(VXml xml)
     }
   }
 
-  bhp.load(xml.gotoChild("bhp"));
+  if (!xml.findChild("bhp").isNull()) bhp.load(xml.gotoChild("bhp"));
   tcpServer.load(xml.gotoChild("tcpServer"));
   autoOpen     = xml.getBool("autoOpen", autoOpen);
   showHomepage = xml.getBool("showHomepage", showHomepage);

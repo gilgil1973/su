@@ -56,7 +56,7 @@ protected:
     tag = 2000; // gilgil temp
     if (!tcpClient.open())
     {
-      LOG_INFO("%s can not connect to %s:%d", change->className().toLatin1().data(), host.toLatin1().data(), port);
+      LOG_INFO("%s can not connect to %s:%d", qPrintable(change->className()), qPrintable(host), port);
       *result = HttpTest::RESULT_CANNOT_CONNECT;
       return;
     }
@@ -69,7 +69,7 @@ protected:
     request.requestLine.method  = "GET";
     request.requestLine.path    = "/";
     request.requestLine.version = "HTTP/1.0";
-    QByteArray hostValue = host.toLatin1().data();
+    QByteArray hostValue = qPrintable(host);
     if (port != 80) hostValue += ":" + QByteArray::number(port);
     request.header.setValue("Host", hostValue);
     request.header.setValue("User-Agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)");
@@ -101,7 +101,7 @@ protected:
 
     if (msg == "")
     {
-      LOG_INFO("%s no http response message", change->className().toLatin1().data());
+      LOG_INFO("%s no http response message", qPrintable(change->className()));
       *result = HttpTest::RESULT_NO_RESPONSE;
       return;
     }
@@ -110,13 +110,13 @@ protected:
     if (!response.parse(msg))
     {
       if (msg.size() > 256) msg.resize(256);
-      LOG_INFO("%s response.parse return false %s", change->className().toLatin1().data(), msg.data());
+      LOG_INFO("%s response.parse return false %s", qPrintable(change->className()), msg.data());
       *result = HttpTest::RESULT_PARSE_ERROR;
       return;
     }
     tag = 8000; // gilgil temp
 
-    LOG_INFO("%s response = %d %s", change->className().toLatin1().data(), response.statusLine.code, response.statusLine.text.data());
+    LOG_INFO("%s response = %d %s", qPrintable(change->className()), response.statusLine.code, response.statusLine.text.data());
     *result = response.statusLine.code;
     tag = 9000; // gilgil temp
   }
@@ -208,6 +208,6 @@ HttpRequestChangePolicy HttpTest::bestPolicy()
   if (resultSslAbsPath   >= RESULT_OK && resultSslAbsPath  != RESULT_BAD_REQUEST) return ChangeSslAbsPath;
   if (resultAddSpace  >= RESULT_OK && resultAddSpace != RESULT_BAD_REQUEST) return ChangeAddSpace;
   if (resultDummyHost == RESULT_OK) return ChangeDummyHost;
-  LOG_ERROR("no appropriate policy for %s:%d", host.toLatin1().data(), port);
+  LOG_ERROR("no appropriate policy for %s:%d", qPrintable(host), port);
   return ChangeNone;
 }
