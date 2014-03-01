@@ -1,0 +1,6 @@
+[TestCase]
+www.sex.com
+www.grooveshark.com
+www.sora.net
+www.uriminzokkiri.com
+www.mofosex.com
