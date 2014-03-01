@@ -43,12 +43,16 @@ MainDlg::~MainDlg()
 void MainDlg::load(VXml xml)
 {
   {
-    QRect rect = geometry();
-    rect.setLeft  ((xml.getInt("left",   100)));
-    rect.setTop   ((xml.getInt("top",    100)));
-    rect.setWidth ((xml.getInt("width",  255)));
-    rect.setHeight((xml.getInt("height", 45)));
-    setGeometry(rect);
+    VXml coordXml = xml.findChild("coord");
+    if (!coordXml.isNull())
+    {
+      QRect rect = geometry();
+      rect.setLeft  ((coordXml.getInt("left",   0)));
+      rect.setTop   ((coordXml.getInt("top",    0)));
+      rect.setWidth ((coordXml.getInt("width",  640)));
+      rect.setHeight((coordXml.getInt("height", 480)));
+      setGeometry(rect);
+    }
   }
 
   bhp.load(xml.gotoChild("bhp"));
@@ -60,11 +64,12 @@ void MainDlg::load(VXml xml)
 void MainDlg::save(VXml xml)
 {
   {
+    VXml coordXml = xml.gotoChild("coord");
     QRect rect = geometry();
-    xml.setInt("left",   rect.left());
-    xml.setInt("top",    rect.top());
-    xml.setInt("width",  rect.width());
-    xml.setInt("height", rect.height());
+    coordXml.setInt("left",   rect.left());
+    coordXml.setInt("top",    rect.top());
+    coordXml.setInt("width",  rect.width());
+    coordXml.setInt("height", rect.height());
   }
 
   bhp.save(xml.gotoChild("bhp"));
