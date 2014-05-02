@@ -32,7 +32,7 @@ protected:
   bool disableProxy();
 
 public:
-  QByteArray              blockMsg;
+  QList<QByteArray>       blockMsgList;
   HttpRequestChangePolicy defaultPolicy;
   HostMgr                 hostMgr;
 

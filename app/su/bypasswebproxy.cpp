@@ -51,9 +51,8 @@ BypassWebProxy::BypassWebProxy(void* owner) : VWebProxy(owner)
   httpsEnabled        = false;
   maxContentCacheSize = 65536;
 
-  blockMsg =
-    "HTTP/1.0 302 Redirect\r\n"
-    "Location: http://www.warning.or.kr";
+  blockMsgList.push_back("www.warning.or.kr");
+  blockMsgList.push_back("MF2 Warning Page");
 
   defaultPolicy = ChangeNone;
 
@@ -174,7 +173,11 @@ void BypassWebProxy::load(VXml xml)
 {
   VWebProxy::load(xml);
 
-  blockMsg = qPrintable(xml.getStr("blockMsg", blockMsg));
+  blockMsgList.clear();
+  xml_foreach (node, xml.gotoChild("blockMsgList").childs())
+  {
+    blockMsgList.push_back(node.getArr("blockMsg", ""));
+  }
   defaultPolicy = (HttpRequestChangePolicy)xml.getInt("defaultPolicy", (int)defaultPolicy);
   hostMgr.load(xml.gotoChild("hostMgr"));
 }
@@ -183,7 +186,11 @@ void BypassWebProxy::save(VXml xml)
 {
   VWebProxy::save(xml);
 
-  xml.setStr("blockMsg", blockMsg);
+  xml.gotoChild("blockMsgList").clearChild();
+  foreach (QByteArray ba, blockMsgList)
+  {
+    xml.gotoChild("blockMsgList").addChild("blockMsg").setArr("blockMsg", ba);
+  }
   xml.setInt("defaultPolicy", (int)defaultPolicy);
   hostMgr.save(xml.gotoChild("hostMgr"));
 }
@@ -241,7 +248,18 @@ void BypassWebProxy::onMyHttpRequestHeader(VHttpRequest*  request,  VWebProxyCon
 void BypassWebProxy::onMyHttpResponseHeader(VHttpResponse* response, VWebProxyConnection* connection)
 {
   QByteArray msg = response->toByteArray();
-  if (!msg.startsWith(blockMsg)) return;
+
+  bool blocked = false;
+  foreach (QByteArray ba, blockMsgList)
+  {
+    if (msg.indexOf(ba) != -1)
+    {
+      blocked = true;
+      break;
+    }
+  }
+  if (!blocked) return;
+
   QString transHost = connection->outClient->host + ":" + QString::number(connection->outClient->port);
   LOG_INFO("-------------------------------------------------")
   LOG_INFO("blocked(%s)!!!", transHost.toLatin1().data());
