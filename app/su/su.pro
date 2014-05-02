@@ -20,20 +20,20 @@ LIBS    += -lWininet
 SOURCES += main.cpp\
     ../common/webtest.cpp \
     ../common/changehttprequest.cpp \
-    bypasshttpproxy.cpp \
     hostmgr.cpp \
     siteunblocker.cpp \
     maindlg.cpp \
-    optiondlg.cpp
+    optiondlg.cpp \
+    bypasswebproxy.cpp
 
 HEADERS  += \
     ../common/webtest.h \
     ../common/changehttprequest.h \
-    bypasshttpproxy.h \
     hostmgr.h \
     siteunblocker.h \
     maindlg.h \
-    optiondlg.h
+    optiondlg.h \
+    bypasswebproxy.h
 
 FORMS    += \
     maindlg.ui \
