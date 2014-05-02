@@ -48,7 +48,8 @@ protected:
 // ----------------------------------------------------------------------------
 BypassWebProxy::BypassWebProxy(void* owner) : VWebProxy(owner)
 {
-  httpsEnabled = false;
+  httpsEnabled        = false;
+  maxContentCacheSize = 65536;
 
   blockMsg =
     "HTTP/1.0 302 Redirect\r\n"
@@ -67,11 +68,12 @@ BypassWebProxy::BypassWebProxy(void* owner) : VWebProxy(owner)
   }
 
   VObject::connect(
-    this, SIGNAL(beforeRequest(VHttpRequest&,VTcpSession*,VTcpClient*)),
-    this, SLOT(myBeforeRequest(VHttpRequest&,VTcpSession*,VTcpClient*)), Qt::DirectConnection);
+    this, SIGNAL(onHttpRequestHeader(VHttpRequest*, VWebProxyConnection*)),
+    this, SLOT(onMyHttpRequestHeader(VHttpRequest*, VWebProxyConnection*)), Qt::DirectConnection);
+
   VObject::connect(
-    this, SIGNAL(beforeResponse(QByteArray&,VTcpClient*,VTcpSession*)),
-    this, SLOT(myBeforeResponse(QByteArray&,VTcpClient*,VTcpSession*)), Qt::DirectConnection);
+    this, SIGNAL(onHttpResponseHeader(VHttpResponse*, VWebProxyConnection*)),
+    this, SLOT(onMyHttpResponseHeader(VHttpResponse*, VWebProxyConnection*)), Qt::DirectConnection);
 }
 
 BypassWebProxy::~BypassWebProxy()
@@ -186,11 +188,10 @@ void BypassWebProxy::save(VXml xml)
   hostMgr.save(xml.gotoChild("hostMgr"));
 }
 
-void BypassWebProxy::myBeforeRequest(VHttpRequest& request, VTcpSession* inSession, VTcpClient* outClient)
+void BypassWebProxy::onMyHttpRequestHeader(VHttpRequest*  request,  VWebProxyConnection* connection)
 {
-  Q_UNUSED(inSession)
-  QString host = outClient->host;
-  int     port = outClient->port;
+  QString host = connection->outClient->host;
+  int     port = connection->outClient->port;
 
   HttpRequestChangePolicy policy = defaultPolicy;
 
@@ -207,25 +208,25 @@ void BypassWebProxy::myBeforeRequest(VHttpRequest& request, VTcpSession* inSessi
     case ChangeAddLine:
     {
       ChangeHttpRequestAddLine change;
-      change.change(request);
+      change.change(*request);
       break;
     }
     case ChangeAddSpace:
     {
       ChangeHttpRequestAddSpace change;
-      change.change(request);
+      change.change(*request);
       break;
     }
     case ChangeDummyHost:
     {
       ChangeHttpRequestDummyHost change;
-      change.change(request);
+      change.change(*request);
       break;
     }
     case ChangeSslAbsPath:
     {
       ChangeHttpRequestSslAbsPath change;
-      change.change(request);
+      change.change(*request);
       break;
     }
     default:
@@ -234,25 +235,25 @@ void BypassWebProxy::myBeforeRequest(VHttpRequest& request, VTcpSession* inSessi
       break;
     }
   }
-  LOG_DEBUG("%s:%d", qPrintable(outClient->host), outClient->port);
+  LOG_DEBUG("%s:%d", qPrintable(connection->outClient->host), connection->outClient->port);
 }
 
-void BypassWebProxy::myBeforeResponse(QByteArray& msg, VTcpClient* outClient, VTcpSession* inSession)
+void BypassWebProxy::onMyHttpResponseHeader(VHttpResponse* response, VWebProxyConnection* connection)
 {
-  Q_UNUSED(inSession)
+  QByteArray msg = response->toByteArray();
   if (!msg.startsWith(blockMsg)) return;
-  QString transHost = outClient->host + ":" + QString::number(outClient->port);
+  QString transHost = connection->outClient->host + ":" + QString::number(connection->outClient->port);
   LOG_INFO("-------------------------------------------------")
   LOG_INFO("blocked(%s)!!!", transHost.toLatin1().data());
   LOG_INFO("-------------------------------------------------");
 
-  QString host = outClient->host;
-  int     port = outClient->port;
+  QString host = connection->outClient->host;
+  int     port = connection->outClient->port;
 
   HostMgr::Key key; key.host = host; key.port = port;
   if (hostMgr.items.find(key) != hostMgr.items.end()) return;
 
-  TestThread* testThread = new TestThread(this, outClient->host, outClient->port);
+  TestThread* testThread = new TestThread(this, connection->outClient->host, connection->outClient->port);
   testThread->freeOnTerminate = true;
   testThread->open();
 }

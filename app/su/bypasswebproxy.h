@@ -44,8 +44,8 @@ signals:
   void newHostDetected(HostMgr::Key key, HostMgr::Value value);
 
 public slots:
-  void myBeforeRequest(VHttpRequest& request, VTcpSession* fromSession, VTcpClient* toClient);
-  void myBeforeResponse(QByteArray& msg, VTcpClient* fromClient, VTcpSession* toSession);
+  void onMyHttpRequestHeader(VHttpRequest*  request,  VWebProxyConnection* connection);
+  void onMyHttpResponseHeader(VHttpResponse* response, VWebProxyConnection* connection);
 };
 
 #endif // __BYPASS_HTTP_PROXY_H__
