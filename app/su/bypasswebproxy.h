@@ -11,19 +11,19 @@
 #ifndef __BYPASS_HTTP_PROXY_H__
 #define __BYPASS_HTTP_PROXY_H__
 
-#include <VHttpProxy>
+#include <VWebProxy>
 #include "hostmgr.h"
 
 // ----------------------------------------------------------------------------
-// BypassHttpProxy
+// BypassWebProxy
 // ----------------------------------------------------------------------------
-class BypassHttpProxy : public VHttpProxy
+class BypassWebProxy : public VWebProxy
 {
   Q_OBJECT
 
 public:
-  BypassHttpProxy(void* owner = NULL);
-  virtual ~BypassHttpProxy();
+  BypassWebProxy(void* owner = NULL);
+  virtual ~BypassWebProxy();
 
 protected:
   virtual bool doOpen();

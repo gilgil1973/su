@@ -7,7 +7,7 @@
 
 #include <VHttpRequest>
 #include <VHttpResponse>
-#include "bypasshttpproxy.h"
+#include "bypasswebproxy.h"
 
 // ----------------------------------------------------------------------------
 // CommandEvent
@@ -57,7 +57,7 @@ public:
   virtual void save(VXml xml);
 
 public:
-  BypassHttpProxy bhp;
+  BypassWebProxy bwp;
 
 public:
   VTcpServer   tcpServer;

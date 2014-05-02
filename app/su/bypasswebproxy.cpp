@@ -1,6 +1,6 @@
-#include "bypasshttpproxy.h"
+#include "bypasswebproxy.h"
 
-#include "../common/httptest.h"
+#include "../common/webtest.h"
 #include <VDebugNew>
 
 // ----------------------------------------------------------------------------
@@ -9,13 +9,13 @@
 class TestThread : public VThread
 {
 public:
-  HttpTest httpTest;
+  WebTest webTest;
 
 public:
   TestThread(void* owner, QString host, int port) : VThread(owner)
   {
-    httpTest.host = host;
-    httpTest.port = port;
+    webTest.host = host;
+    webTest.port = port;
   }
 
   virtual ~TestThread()
@@ -26,15 +26,15 @@ public:
 protected:
   virtual void run()
   {
-    httpTest.test();
-    HttpRequestChangePolicy policy = httpTest.bestPolicy();
+    webTest.test();
+    HttpRequestChangePolicy policy = webTest.bestPolicy();
     LOG_INFO("--------------------------------");
-    LOG_INFO("policy for (%s:%d) is %d", httpTest.host.toLatin1().data(), httpTest.port, (int)policy);
+    LOG_INFO("policy for (%s:%d) is %d", webTest.host.toLatin1().data(), webTest.port, (int)policy);
     LOG_INFO("--------------------------------");
-    HostMgr::Key key;     key.host = httpTest.host; key.port = httpTest.port;
+    HostMgr::Key key;     key.host = webTest.host; key.port = webTest.port;
     HostMgr::Value value; value.policy = policy;
 
-    BypassHttpProxy* proxy = (BypassHttpProxy*)owner;
+    BypassWebProxy* proxy = (BypassWebProxy*)owner;
     proxy->hostMgr.lock();
     proxy->hostMgr.items.insert(key, value);
     proxy->hostMgr.unlock();
@@ -44,10 +44,12 @@ protected:
 };
 
 // ----------------------------------------------------------------------------
-// BypassHttpProxy
+// BypassWebProxy
 // ----------------------------------------------------------------------------
-BypassHttpProxy::BypassHttpProxy(void* owner) : VHttpProxy(owner)
+BypassWebProxy::BypassWebProxy(void* owner) : VWebProxy(owner)
 {
+  httpsEnabled = false;
+
   blockMsg =
     "HTTP/1.0 302 Redirect\r\n"
     "Location: http://www.warning.or.kr";
@@ -64,34 +66,34 @@ BypassHttpProxy::BypassHttpProxy(void* owner) : VHttpProxy(owner)
     hostMgr.items.insert(key, value);
   }
 
-  QObject::connect(
+  VObject::connect(
     this, SIGNAL(beforeRequest(VHttpRequest&,VTcpSession*,VTcpClient*)),
     this, SLOT(myBeforeRequest(VHttpRequest&,VTcpSession*,VTcpClient*)), Qt::DirectConnection);
-  QObject::connect(
+  VObject::connect(
     this, SIGNAL(beforeResponse(QByteArray&,VTcpClient*,VTcpSession*)),
     this, SLOT(myBeforeResponse(QByteArray&,VTcpClient*,VTcpSession*)), Qt::DirectConnection);
 }
 
-BypassHttpProxy::~BypassHttpProxy()
+BypassWebProxy::~BypassWebProxy()
 {
   close();
 }
 
-bool BypassHttpProxy::doOpen()
+bool BypassWebProxy::doOpen()
 {
   if (!enableProxy()) return false;
-  return VHttpProxy::doOpen();
+  return VWebProxy::doOpen();
 }
 
-bool BypassHttpProxy::doClose()
+bool BypassWebProxy::doClose()
 {
   if (!disableProxy()) return false;
-  return VHttpProxy::doClose();
+  return VWebProxy::doClose();
 }
 
 #include <Wininet.h>
 
-bool BypassHttpProxy::enableProxy()
+bool BypassWebProxy::enableProxy()
 {
   INTERNET_PER_CONN_OPTION_LIST list;
   BOOL    bReturn;
@@ -131,7 +133,7 @@ bool BypassHttpProxy::enableProxy()
   return (bool)bReturn;
   }
 
-bool BypassHttpProxy::disableProxy()
+bool BypassWebProxy::disableProxy()
 {
   //conn_name: active connection name.
   INTERNET_PER_CONN_OPTION_LIST list;
@@ -166,25 +168,25 @@ bool BypassHttpProxy::disableProxy()
   return bReturn;
 }
 
-void BypassHttpProxy::load(VXml xml)
+void BypassWebProxy::load(VXml xml)
 {
-  VHttpProxy::load(xml);
+  VWebProxy::load(xml);
 
   blockMsg = qPrintable(xml.getStr("blockMsg", blockMsg));
   defaultPolicy = (HttpRequestChangePolicy)xml.getInt("defaultPolicy", (int)defaultPolicy);
   hostMgr.load(xml.gotoChild("hostMgr"));
 }
 
-void BypassHttpProxy::save(VXml xml)
+void BypassWebProxy::save(VXml xml)
 {
-  VHttpProxy::save(xml);
+  VWebProxy::save(xml);
 
   xml.setStr("blockMsg", blockMsg);
   xml.setInt("defaultPolicy", (int)defaultPolicy);
   hostMgr.save(xml.gotoChild("hostMgr"));
 }
 
-void BypassHttpProxy::myBeforeRequest(VHttpRequest& request, VTcpSession* inSession, VTcpClient* outClient)
+void BypassWebProxy::myBeforeRequest(VHttpRequest& request, VTcpSession* inSession, VTcpClient* outClient)
 {
   Q_UNUSED(inSession)
   QString host = outClient->host;
@@ -235,7 +237,7 @@ void BypassHttpProxy::myBeforeRequest(VHttpRequest& request, VTcpSession* inSess
   LOG_DEBUG("%s:%d", qPrintable(outClient->host), outClient->port);
 }
 
-void BypassHttpProxy::myBeforeResponse(QByteArray& msg, VTcpClient* outClient, VTcpSession* inSession)
+void BypassWebProxy::myBeforeResponse(QByteArray& msg, VTcpClient* outClient, VTcpSession* inSession)
 {
   Q_UNUSED(inSession)
   if (!msg.startsWith(blockMsg)) return;

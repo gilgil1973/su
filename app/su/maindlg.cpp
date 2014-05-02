@@ -55,7 +55,7 @@ void MainDlg::load(VXml xml)
     }
   }
 
-  if (!xml.findChild("bhp").isNull()) bhp.load(xml.gotoChild("bhp"));
+  if (!xml.findChild("bwp").isNull()) bwp.load(xml.gotoChild("bwp"));
   tcpServer.load(xml.gotoChild("tcpServer"));
   autoOpen     = xml.getBool("autoOpen", autoOpen);
   showHomepage = xml.getBool("showHomepage", showHomepage);
@@ -72,7 +72,7 @@ void MainDlg::save(VXml xml)
     coordXml.setInt("height", rect.height());
   }
 
-  bhp.save(xml.gotoChild("bhp"));
+  bwp.save(xml.gotoChild("bwp"));
   tcpServer.save(xml.gotoChild("tcpServer"));
   xml.setBool("autoOpen", autoOpen);
   xml.setBool("showHomepage", showHomepage);
@@ -96,13 +96,13 @@ void MainDlg::initializeControl()
   tcpServer.port = 8081;
 
   QObject::connect(&tcpServer, SIGNAL(runned(VTcpSession*)), this, SLOT(run(VTcpSession*)), Qt::DirectConnection);
-  QObject::connect(&bhp, SIGNAL(newHostDetected(HostMgr::Key,HostMgr::Value)), this, SLOT(newHostDetected(HostMgr::Key,HostMgr::Value)), Qt::DirectConnection);
+  QObject::connect(&bwp, SIGNAL(newHostDetected(HostMgr::Key,HostMgr::Value)), this, SLOT(newHostDetected(HostMgr::Key,HostMgr::Value)), Qt::DirectConnection);
 }
 
 void MainDlg::finalizeControl()
 {
   LOG_DEBUG("");
-  bhp.close();
+  bwp.close();
 }
 
 void MainDlg::loadControl()
@@ -119,7 +119,7 @@ void MainDlg::saveControl()
 
 void MainDlg::setControl()
 {
-  bool active = bhp.active();
+  bool active = bwp.active();
   ui->btnOpen->setEnabled(!active);
   ui->btnClose->setEnabled(active);
   ui->btnOption->setEnabled(!active);
@@ -259,9 +259,9 @@ void MainDlg::_terminate()
 void MainDlg::on_btnOpen_clicked()
 {
   LOG_DEBUG("");
-  if (!bhp.open())
+  if (!bwp.open())
   {
-    QMessageBox::warning(NULL, "error", bhp.error.msg);
+    QMessageBox::warning(NULL, "error", bwp.error.msg);
   }
   setControl();
 }
@@ -269,7 +269,7 @@ void MainDlg::on_btnOpen_clicked()
 void MainDlg::on_btnClose_clicked()
 {
   LOG_DEBUG("");
-  bhp.close();
+  bwp.close();
   setControl();
 }
 
