@@ -1,4 +1,4 @@
-site unblocker version 1.4
+site unblocker version 1.6
 ==================================
 
 
