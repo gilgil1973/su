@@ -18,7 +18,7 @@ win32:RC_FILE = su.rc
 LIBS    += -lWininet
 
 SOURCES += main.cpp\
-    ../common/httptest.cpp \
+    ../common/webtest.cpp \
     ../common/changehttprequest.cpp \
     bypasshttpproxy.cpp \
     hostmgr.cpp \
@@ -27,7 +27,7 @@ SOURCES += main.cpp\
     optiondlg.cpp
 
 HEADERS  += \
-    ../common/httptest.h \
+    ../common/webtest.h \
     ../common/changehttprequest.h \
     bypasshttpproxy.h \
     hostmgr.h \
