@@ -34,12 +34,12 @@ public:
     printf("http test version 8.0\n");
     printf("Copyright (c) Gilbert Lee All rights reserved\n");
     printf("\n");
-    printf("httptest <host> [<port>]\n");
+    printf("webtest <host> [<port>]\n");
     printf("\n");
     printf("example\n");
     printf("\n");
-    printf("  httptest www.gilgil.net\n");
-    printf("  httptest www.google.com 8080\n");
+    printf("  webtest www.gilgil.net\n");
+    printf("  webtest www.google.com 8080\n");
   }
 };
 

@@ -1,4 +1,4 @@
-#include "httptest.h"
+#include "webtest.h"
 #include "changehttprequest.h"
 #include <VHttpRequest>
 #include <VHttpResponse>
@@ -68,7 +68,7 @@ protected:
     VHttpRequest request;
     request.requestLine.method  = "GET";
     request.requestLine.path    = "/";
-    request.requestLine.version = "HTTP/1.0";
+    request.requestLine.version = "HTTP/1.1";
     QByteArray hostValue = qPrintable(host);
     if (port != 80) hostValue += ":" + QByteArray::number(port);
     request.header.setValue("Host", hostValue);
@@ -95,7 +95,10 @@ protected:
       int readLen = tcpClient.tcpSession->read(oneMsg);
       if (readLen == VERR_FAIL) break;
       msg += oneMsg;
-      if (response.parse(msg)) break;
+      {
+        QByteArray tempMsg = msg;
+        if (response.parse(tempMsg)) break;
+      }
     }
     tag = 6000; // gilgil temp
 
@@ -130,10 +133,10 @@ WebTest::WebTest()
   host = "";
   port = 0;
 
-  resultNone      = RESULT_NONE;
-  resultAddLine   = RESULT_NONE;
-  resultAddSpace  = RESULT_NONE;
-  resultDummyHost = RESULT_NONE;
+  resultNone       = RESULT_NONE;
+  resultAddLine    = RESULT_NONE;
+  resultAddSpace   = RESULT_NONE;
+  resultDummyHost  = RESULT_NONE;
   resultSslAbsPath = RESULT_NONE;
 }
 
@@ -193,11 +196,11 @@ void WebTest::test()
   //
   // close
   //
-  noneThread.wait(20000);      noneThread.close();
-  addLineThread.wait(20000);   addLineThread.close();
-  addSpaceThread.wait(20000);  addSpaceThread.close();
-  dummyHostThread.wait(20000); dummyHostThread.close();
-  sslAbsPathThread.wait(20000);sslAbsPathThread.close();
+  noneThread.wait(20000);       noneThread.close();
+  addLineThread.wait(20000);    addLineThread.close();
+  addSpaceThread.wait(20000);   addSpaceThread.close();
+  dummyHostThread.wait(20000);  dummyHostThread.close();
+  sslAbsPathThread.wait(20000); sslAbsPathThread.close();
 }
 
 HttpRequestChangePolicy WebTest::bestPolicy()

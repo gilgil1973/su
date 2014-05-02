@@ -15,9 +15,9 @@
 #include "changehttprequest.h"
 
 // ----------------------------------------------------------------------------
-// HttpTest
+// WebTest
 // ----------------------------------------------------------------------------
-class HttpTest
+class WebTest
 {
 public:
   static const int RESULT_NONE              = 0;
@@ -32,7 +32,7 @@ public:
   static const int RESULT_NOT_FOUND         = 404;
 
 public:
-  HttpTest();
+  WebTest();
 
 public:
   QString host;
