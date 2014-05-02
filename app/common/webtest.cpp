@@ -8,9 +8,9 @@
 #include <VDebugNew>
 
 // ----------------------------------------------------------------------------
-// HttpTestThread
+// WebTestThread
 // ----------------------------------------------------------------------------
-class HttpTestThread : public VThread
+class WebTestThread : public VThread
 {
 public:
   QString host;
@@ -24,7 +24,7 @@ protected:
   VTcpClient tcpClient;
 
 public:
-  HttpTestThread() : VThread(NULL)
+  WebTestThread() : VThread(NULL)
   {
     host   = "";
     port   = 0;
@@ -32,7 +32,7 @@ public:
     change = NULL;
   }
 
-  virtual ~HttpTestThread()
+  virtual ~WebTestThread()
   {
     close();
     SAFE_DELETE(change);
@@ -57,7 +57,7 @@ protected:
     if (!tcpClient.open())
     {
       LOG_INFO("%s can not connect to %s:%d", qPrintable(change->className()), qPrintable(host), port);
-      *result = HttpTest::RESULT_CANNOT_CONNECT;
+      *result = WebTest::RESULT_CANNOT_CONNECT;
       return;
     }
 
@@ -102,7 +102,7 @@ protected:
     if (msg == "")
     {
       LOG_INFO("%s no http response message", qPrintable(change->className()));
-      *result = HttpTest::RESULT_NO_RESPONSE;
+      *result = WebTest::RESULT_NO_RESPONSE;
       return;
     }
     tag = 7000; // gilgil temp
@@ -111,7 +111,7 @@ protected:
     {
       if (msg.size() > 256) msg.resize(256);
       LOG_INFO("%s response.parse return false %s", qPrintable(change->className()), msg.data());
-      *result = HttpTest::RESULT_PARSE_ERROR;
+      *result = WebTest::RESULT_PARSE_ERROR;
       return;
     }
     tag = 8000; // gilgil temp
@@ -123,9 +123,9 @@ protected:
 };
 
 // ----------------------------------------------------------------------------
-// HttpTest
+// WebTest
 // ----------------------------------------------------------------------------
-HttpTest::HttpTest()
+WebTest::WebTest()
 {
   host = "";
   port = 0;
@@ -137,12 +137,12 @@ HttpTest::HttpTest()
   resultSslAbsPath = RESULT_NONE;
 }
 
-void HttpTest::test()
+void WebTest::test()
 {
   //
   // normal
   //
-  HttpTestThread noneThread;
+  WebTestThread noneThread;
   noneThread.host   = host;
   noneThread.port   = port;
   noneThread.result = &resultNone;
@@ -153,7 +153,7 @@ void HttpTest::test()
   //
   // addLine
   //
-  HttpTestThread addLineThread;
+  WebTestThread addLineThread;
   addLineThread.host   = host;
   addLineThread.port   = port;
   addLineThread.result = &resultAddLine;
@@ -163,7 +163,7 @@ void HttpTest::test()
   //
   // addSpace
   //
-  HttpTestThread addSpaceThread;
+  WebTestThread addSpaceThread;
   addSpaceThread.host   = host;
   addSpaceThread.port   = port;
   addSpaceThread.result = &resultAddSpace;
@@ -173,7 +173,7 @@ void HttpTest::test()
   //
   // dummyHost
   //
-  HttpTestThread dummyHostThread;
+  WebTestThread dummyHostThread;
   dummyHostThread.host   = host;
   dummyHostThread.port   = port;
   dummyHostThread.result = &resultDummyHost;
@@ -183,7 +183,7 @@ void HttpTest::test()
   //
   // sslAbsPath
   //
-  HttpTestThread sslAbsPathThread;
+  WebTestThread sslAbsPathThread;
   sslAbsPathThread.host = host;
   sslAbsPathThread.port = port;
   sslAbsPathThread.result = &resultSslAbsPath;
@@ -200,7 +200,7 @@ void HttpTest::test()
   sslAbsPathThread.wait(20000);sslAbsPathThread.close();
 }
 
-HttpRequestChangePolicy HttpTest::bestPolicy()
+HttpRequestChangePolicy WebTest::bestPolicy()
 {
   // if (resultNone      == RESULT_OK) return ChangeNone;
   if (resultAddLine   >= RESULT_OK && resultAddLine  != RESULT_BAD_REQUEST) return ChangeAddLine;

@@ -8,8 +8,8 @@
 //
 // ----------------------------------------------------------------------------
 
-#ifndef __HTTP_TEST_H__
-#define __HTTP_TEST_H__
+#ifndef __WEB_TEST_H__
+#define __WEB_TEST_H__
 
 #include <VHttpCommon>
 #include "changehttprequest.h"
@@ -50,4 +50,4 @@ public:
   int resultSslAbsPath;
 };
 
-#endif // __HTTP_TEST_H__
+#endif // __WEB_TEST_H__

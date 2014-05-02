@@ -10,7 +10,7 @@ QT       -= gui
 
 include (../../../../vdream/vdream90/lib/vdream.pri)
 
-TARGET = httptest
+TARGET = webtest
 CONFIG   += console
 CONFIG   -= app_bundle
 
@@ -19,9 +19,9 @@ TEMPLATE = app
 DESTDIR  = ../../bin
 
 SOURCES += main.cpp \
-    ../common/httptest.cpp \
+    ../common/webtest.cpp \
     ../common/changehttprequest.cpp
 
 HEADERS += \
-    ../common/httptest.h \
+    ../common/webtest.h \
     ../common/changehttprequest.h

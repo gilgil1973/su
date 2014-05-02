@@ -3,7 +3,7 @@
 #include <VApp>
 #include <QCoreApplication>
 #include <QDebug>
-#include "../common/httptest.h"
+#include "../common/webtest.h"
 
 using namespace std;
 
@@ -57,18 +57,18 @@ int main(int argc, char *argv[])
 
   printf("testing   %s:%d\n", param.host.toLatin1().data(), param.port);
   LOG_INFO("testing   %s:%d", param.host.toLatin1().data(), param.port);
-  HttpTest httpTest;
-  httpTest.host = param.host;
-  httpTest.port = param.port;
-  httpTest.test();
+  WebTest webTest;
+  webTest.host = param.host;
+  webTest.port = param.port;
+  webTest.test();
 
-  printf("0:none       %d\n", httpTest.resultNone);
-  printf("1:addLine    %d\n", httpTest.resultAddLine);
-  printf("2:addSpace   %d\n", httpTest.resultAddSpace);
-  printf("3:dummyHost  %d\n", httpTest.resultDummyHost);
-  printf("4:sslAbsPath %d\n", httpTest.resultSslAbsPath);
+  printf("0:none       %d\n", webTest.resultNone);
+  printf("1:addLine    %d\n", webTest.resultAddLine);
+  printf("2:addSpace   %d\n", webTest.resultAddSpace);
+  printf("3:dummyHost  %d\n", webTest.resultDummyHost);
+  printf("4:sslAbsPath %d\n", webTest.resultSslAbsPath);
 
-  printf("best policy= %d\n", (int)httpTest.bestPolicy());
+  printf("best policy= %d\n", (int)webTest.bestPolicy());
 
   return 0;
 }
